@@ -19,7 +19,7 @@ SW_ONE_SIMU_TEST            = 1; % test a single frequency by default
 SW_DIST_ON                  = 1; % default turn on const or step change disturbance frequency
 SW_CHIRP_DIST               = 0; % default turn off chirp disturbance
 SW_TUNE                     = 0;
-SW_BASELINE_CONTROL_SYS     = 0; % check the baseline system
+SW_BASELINE_CONTROL_SYS     = 1; % check the baseline system, create bode plots
 SW_ADDITIONAL_PLOT          = 0;
 SW_STEADY_STATE_CONTROL_SYS = 0;
 Fs=800;     Ts=1/Fs;        Te=Ts;
@@ -137,6 +137,21 @@ F_init      = F1;
 lambda_init = 0.93;
 lambda_end  = 0.99;
 %% Band-pass Q filter parameter
+
+% while 1
+%     input_alpha = input('Choose value of alpha:\n   0.865 (default, press ENTER) \n');
+%     if isempty(input_alpha)
+%         input_alpha        = 0.865;   
+%     end
+%     break;
+% end
+% 
+% alpha_init  = input_alpha; 
+% alpha_end   = input_alpha;
+% adap_init.alpha_pre = input_alpha;
+% alpha       = alpha_end;
+
+% alpha = 0.865
 alpha_init  = 0.865; 
 alpha_end   = 0.8650;
 adap_init.alpha_pre = 0.865;
@@ -170,17 +185,19 @@ if SW_BASELINE_CONTROL_SYS
     title('Frequency response of the feedback controller')
     S_func = feedback(1,tf(R,S,Ts,'variable','z^-1')*tf(B,A,Ts,'variable','z^-1'));
     figure, bodeplot(S_func,bode_opt)
+    grid on,zoom on
     figure, bodeplot(tf(B,A,Ts,'variable','z^-1'),bode_opt)
+    grid on,zoom on
 
-    L       = length(bruitbench);
-    NFFT    = 2^nextpow2(L);
-    [spec_bruitbench.f,spec_bruitbench.amp] =...
-        spectre_psd_rms(bruitbench,Fs,NFFT);
-    figure;
-    plot(spec_bruitbench.f,spec_bruitbench.amp)
-    xlabel('Frequency [Hz]')
-    ylabel('dB [Vrms]')
-    title('Spectral density of the measurement noise')
+%     L       = length(bruitbench);
+%     NFFT    = 2^nextpow2(L);
+%     [spec_bruitbench.f,spec_bruitbench.amp] =...
+%         spectre_psd_rms(bruitbench,Fs,NFFT);
+%     figure;
+%     plot(spec_bruitbench.f,spec_bruitbench.amp)
+%     xlabel('Frequency [Hz]')
+%     ylabel('dB [Vrms]')
+%     title('Spectral density of the measurement noise')
 end
 
 simuName    = 'simulator_1bd_submit';
@@ -298,7 +315,7 @@ if FLAG_DIST_FREQ == FLAG_CONST_DIST_FREQ
                 end
             end
         end
-        pause(10); % let the CPU take a 10-sec rest
+        % pause(10); % let the CPU take a 10-sec rest
     end
     disp ('===================================================================')
     disp ('test results saved to: level1_freq_dom_result_const_freq')
@@ -313,7 +330,7 @@ if FLAG_DIST_FREQ == FLAG_CONST_DIST_FREQ
             'data_cont_freq');
     end
     
-    %% STEP CHANGE DISTURBANCE FREQUENCY
+%% STEP CHANGE DISTURBANCE FREQUENCY
 elseif FLAG_DIST_FREQ == FLAG_STEP_CHANGE_DIST_FREQ
     t_NBon      = 5;               % NB Dist injection time
     t_Qon       = t_NBon;          % bandpass Q filter on time
@@ -492,7 +509,7 @@ elseif FLAG_DIST_FREQ == FLAG_STEP_CHANGE_DIST_FREQ
                 end
             end
         end
-        pause(10); % let the CPU take a 10-sec rest
+        % pause(10); % let the CPU take a 10-sec rest
     end
     level1_time_dom_result_step_change_freq.freq_table =...
         freq_table;
@@ -509,7 +526,7 @@ elseif FLAG_DIST_FREQ == FLAG_STEP_CHANGE_DIST_FREQ
             'data_step_freq');
     end
     
-    %% TEST FOR CHIRP DISTURBANCE
+%% TEST FOR CHIRP DISTURBANCE
 elseif FLAG_DIST_FREQ == FLAG_CHIRP_DIST
     SW_CHIRP_DIST = 1;
     SW_DIST_ON    = 0;
@@ -710,7 +727,7 @@ elseif FLAG_DIST_FREQ == FLAG_CHIRP_DIST
                 end
             end
         end
-        pause(10); % let the CPU take a 10-sec rest
+        % pause(10); % let the CPU take a 10-sec rest
     end
     disp ('===================================================================')
     disp ('test results saved to: level1_time_dom_result_chirp_freq')
